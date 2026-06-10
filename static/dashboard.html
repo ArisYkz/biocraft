@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard — BIOCRAFT DIGITAL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+  body { background: #101415; color: #e0e3e5; font-family: 'Hanken Grotesk', sans-serif; }
+  .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+</style>
+</head>
+<body>
+<nav class="flex justify-between items-center px-6 md:px-12 h-20 max-w-[1280px] mx-auto border-b border-white/10">
+  <div class="flex items-center gap-2">
+    <span class="material-symbols-outlined text-[#00dce5] text-3xl" style="font-variation-settings:'FILL'1">biotech</span>
+    <span class="text-[#00dce5] font-bold" style="font-family:'Space Grotesk',sans-serif;font-size:24px">BIOCRAFT DIGITAL</span>
+  </div>
+  <div class="flex items-center gap-6">
+    <span id="nav-username" class="text-[#c7c6cd] text-sm" style="font-family:'JetBrains Mono',monospace"></span>
+    <button onclick="API.logout()" class="text-sm text-[#c7c6cd] hover:text-[#ffb4ab] transition-colors" style="font-family:'JetBrains Mono',monospace">LOGOUT</button>
+  </div>
+</nav>
+
+<main class="max-w-[1280px] mx-auto px-6 md:px-12 py-12">
+  <div class="glass-card rounded-2xl p-8 mb-8">
+    <h1 class="text-2xl font-bold mb-6" style="font-family:'Space Grotesk',sans-serif;color:#00dce5">UPLINK ESTABLISHED</h1>
+    <div id="user-info" class="space-y-3 text-sm" style="font-family:'JetBrains Mono',monospace;color:#c7c6cd">
+      <div>Loading user data...</div>
+    </div>
+    </div>
+  </div>
+
+  <div class="glass-card rounded-2xl p-8 mb-8">
+    <h2 class="text-lg font-bold mb-6" style="font-family:'Space Grotesk',sans-serif;color:#e0e3e5">SUBMIT INQUIRY</h2>
+    <form id="inquiry-form" class="space-y-4">
+      <div class="space-y-1">
+        <label class="text-xs uppercase tracking-widest text-[#c7c6cd]/70" style="font-family:'JetBrains Mono',monospace">SUBJECT</label>
+        <input id="inquiry-subject" required
+          class="w-full bg-[#0b0f10] border border-white/10 rounded-xl p-3 text-sm text-[#e0e3e5] outline-none focus:border-[#00dce5]/50 focus:ring-1 focus:ring-[#00dce5]/30"
+          placeholder="Brief title for your inquiry" style="font-family:'Hanken Grotesk',sans-serif"/>
+      </div>
+      <div class="space-y-1">
+        <label class="text-xs uppercase tracking-widest text-[#c7c6cd]/70" style="font-family:'JetBrains Mono',monospace">MESSAGE</label>
+        <textarea id="inquiry-message" required rows="4"
+          class="w-full bg-[#0b0f10] border border-white/10 rounded-xl p-3 text-sm text-[#e0e3e5] outline-none focus:border-[#00dce5]/50 focus:ring-1 focus:ring-[#00dce5]/30 resize-none"
+          placeholder="Describe what you need..." style="font-family:'Hanken Grotesk',sans-serif"></textarea>
+      </div>
+      <div id="inquiry-feedback" class="hidden p-3 rounded-xl text-sm"></div>
+      <button type="submit"
+        class="px-8 py-3 bg-[#00dce5] text-[#002021] font-bold text-sm rounded-xl hover:shadow-[0_0_20px_rgba(0,220,229,0.4)] transition-all"
+        style="font-family:'JetBrains Mono',monospace">SEND INQUIRY</button>
+    </form>
+  </div>
+
+  <div class="glass-card rounded-2xl p-8">
+    <h2 class="text-lg font-bold mb-6" style="font-family:'Space Grotesk',sans-serif;color:#e0e3e5">MY INQUIRIES</h2>
+    <div id="inquiries-list" class="space-y-4">
+      <div class="text-sm text-[#c7c6cd]" style="font-family:'JetBrains Mono',monospace">Loading...</div>
+    </div>
+  </div>
+</main>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/chat.js"></script>
+<script>
+(async function() {
+  if (!API.isLoggedIn()) { window.location.href = "/"; return; }
+
+  const user = await API.getMe();
+  if (user.is_admin) { window.location.href = "/static/admin.html"; return; }
+  document.getElementById("nav-username").textContent = user.username.toUpperCase();
+  document.getElementById("user-info").innerHTML = `
+    <div>ID: ${user.id}</div>
+    <div>USERNAME: ${user.username}</div>
+    <div>EMAIL: ${user.email}</div>
+    <div>ROLE: USER</div>
+    <div>JOINED: ${new Date(user.created_at).toLocaleDateString()}</div>
+  `;
+
+  document.getElementById("inquiry-form").onsubmit = async (e) => {
+    e.preventDefault();
+    const fb = document.getElementById("inquiry-feedback");
+    fb.classList.add("hidden");
+
+    try {
+      await API.request("POST", "/inquiries", {
+        subject: document.getElementById("inquiry-subject").value,
+        message: document.getElementById("inquiry-message").value,
+      });
+      fb.className = "mb-4 p-3 rounded-xl text-sm bg-[#2ae500]/10 text-[#2ae500] border border-[#2ae500]/20";
+      fb.textContent = "Inquiry submitted.";
+      fb.classList.remove("hidden");
+      document.getElementById("inquiry-form").reset();
+      loadInquiries();
+    } catch (err) {
+      fb.className = "mb-4 p-3 rounded-xl text-sm bg-[#93000a] text-[#ffdad6]";
+      fb.textContent = `ERROR: ${err.message}`;
+      fb.classList.remove("hidden");
+    }
+  };
+
+  async function loadInquiries() {
+    try {
+      const inquiries = await API.request("GET", "/inquiries/mine");
+      const container = document.getElementById("inquiries-list");
+      if (inquiries.length === 0) {
+        container.innerHTML = '<div class="text-sm text-[#c7c6cd]" style="font-family:\'JetBrains Mono\',monospace">No inquiries yet.</div>';
+        return;
+      }
+      container.innerHTML = inquiries.map(inq => {
+        const statusColors = {
+          pending: 'bg-yellow-500/20 text-yellow-400',
+          in_review: 'bg-[#00dce5]/20 text-[#00dce5]',
+          resolved: 'bg-[#2ae500]/20 text-[#2ae500]',
+          closed: 'bg-white/10 text-[#c7c6cd]',
+        };
+        const statusColor = statusColors[inq.status] || 'bg-white/10 text-[#c7c6cd]';
+        return `
+          <div class="p-4 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <div class="text-sm font-bold text-[#e0e3e5]">${inq.subject}</div>
+                <div class="text-xs text-[#c7c6cd] mt-1" style="font-family:'JetBrains Mono',monospace">${new Date(inq.created_at).toLocaleDateString()}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-xs font-bold ${statusColor}" style="font-family:'JetBrains Mono',monospace">${inq.status.toUpperCase()}</span>
+            </div>
+            <div class="text-sm text-[#c7c6cd] mt-2">${inq.message}</div>
+            ${inq.admin_response ? `
+              <div class="mt-3 p-3 rounded-lg" style="background:rgba(0,220,229,0.05);border:1px solid rgba(0,220,229,0.1)">
+                <div class="text-xs font-bold text-[#00dce5] mb-1" style="font-family:'JetBrains Mono',monospace">ADMIN RESPONSE</div>
+                <div class="text-sm text-[#e0e3e5]">${inq.admin_response}</div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    } catch {
+      document.getElementById("inquiries-list").innerHTML = '<div class="text-sm text-[#ffb4ab]" style="font-family:\'JetBrains Mono\',monospace">Failed to load inquiries.</div>';
+    }
+  }
+
+  loadInquiries();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BIOCRAFT DIGITAL | Evolving Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface-dim": "#101415", "on-error-container": "#ffdad6",
+        "surface-container-highest": "#323537", "secondary-container": "#00f4fe",
+        "on-surface-variant": "#c7c6cd", "inverse-primary": "#595e70",
+        "on-secondary-fixed-variant": "#004f53", "on-primary-fixed-variant": "#414658",
+        "on-primary": "#2b3040", "on-tertiary-fixed-variant": "#095300",
+        "secondary-fixed-dim": "#00dce5", "primary-fixed": "#dee1f7",
+        "surface": "#101415", "tertiary": "#2ae500", "on-tertiary": "#053900",
+        "primary-fixed-dim": "#c2c6db", "error": "#ffb4ab", "on-secondary": "#003739",
+        "inverse-surface": "#e0e3e5", "on-secondary-fixed": "#002021",
+        "on-primary-fixed": "#161b2b", "on-secondary-container": "#006c71",
+        "surface-container-low": "#191c1e", "outline": "#909097",
+        "tertiary-fixed": "#79ff5b", "secondary": "#e6feff",
+        "inverse-on-surface": "#2d3133", "surface-tint": "#c2c6db",
+        "surface-bright": "#363a3b", "on-tertiary-fixed": "#022100",
+        "primary": "#c2c6db", "surface-container-lowest": "#0b0f10",
+        "on-primary-container": "#777b8e", "secondary-fixed": "#63f7ff",
+        "on-tertiary-container": "#179000", "on-background": "#e0e3e5",
+        "surface-container": "#1d2022", "primary-container": "#0a0f1e",
+        "surface-variant": "#323537", "error-container": "#93000a",
+        "background": "#101415", "on-surface": "#e0e3e5", "on-error": "#690005",
+        "surface-container-high": "#272a2c", "tertiary-container": "#011400",
+        "tertiary-fixed-dim": "#2ae500", "outline-variant": "#46464c"
+      },
+      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+      spacing: { "margin-desktop": "48px", "margin-mobile": "16px", "container-max": "1280px", unit: "8px", gutter: "24px" },
+      fontFamily: {
+        "headline-lg": ["Space Grotesk"], "headline-md": ["Space Grotesk"],
+        "label-sm": ["JetBrains Mono"], "body-lg": ["Hanken Grotesk"],
+        "headline-xl": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"],
+        "body-md": ["Hanken Grotesk"], "label-md": ["JetBrains Mono"]
+      },
+      fontSize: {
+        "headline-lg": ["40px", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600" }],
+        "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "500" }],
+        "label-sm": ["12px", { lineHeight: "1.4", letterSpacing: "0.03em", fontWeight: "500" }],
+        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+        "headline-xl": ["64px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-lg-mobile": ["32px", { lineHeight: "1.2", fontWeight: "600" }],
+        "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+        "label-md": ["14px", { lineHeight: "1.4", letterSpacing: "0.05em", fontWeight: "500" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+  @keyframes float { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-10px) rotate(1deg); } 100% { transform: translateY(0px) rotate(0deg); } }
+  @keyframes pulse-glow { 0%, 100% { opacity: 0.3; filter: blur(20px); } 50% { opacity: 0.6; filter: blur(35px); } }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+  .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05); }
+  .cyan-glow { box-shadow: 0 0 25px rgba(0, 220, 229, 0.15); }
+  .reveal-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+  .reveal-on-scroll.active { opacity: 1; transform: translateY(0); }
+  body::-webkit-scrollbar { width: 6px; }
+  body::-webkit-scrollbar-track { background: #0b0f10; }
+  body::-webkit-scrollbar-thumb { background: #00dce5; border-radius: 10px; }
+  #matrix-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+</style>
+</head>
+<body class="bg-background text-on-surface selection:bg-secondary-fixed-dim selection:text-on-secondary overflow-x-hidden">
+
+<header class="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-3xl border-b border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.5)]">
+<nav class="flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20 max-w-container-max mx-auto">
+  <div class="flex items-center gap-2 cursor-pointer transition-transform active:scale-95">
+    <span class="material-symbols-outlined text-secondary-fixed-dim text-3xl" style="font-variation-settings: 'FILL' 1;">biotech</span>
+    <span class="font-headline-md text-headline-md font-bold tracking-tighter text-secondary-fixed-dim drop-shadow-[0_0_15px_rgba(0,220,229,0.3)]">BIOCRAFT DIGITAL</span>
+  </div>
+  <div class="hidden md:flex items-center gap-gutter">
+    <a class="font-label-md text-label-md text-secondary-fixed-dim border-b-2 border-secondary-fixed-dim pb-1" href="#">Solutions</a>
+    <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary-fixed-dim transition-colors duration-300" href="#">Evolution</a>
+    <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary-fixed-dim transition-colors duration-300" href="#">Contact</a>
+    <span class="h-4 w-[1px] bg-white/10 mx-2"></span>
+    <span id="nav-auth-links">
+      <button onclick="toggleAuthModal(true); switchModalTab('login')" class="font-label-md text-label-md text-on-surface-variant hover:text-secondary-fixed-dim transition-colors duration-300 cursor-pointer">Login</button>
+    </span>
+  </div>
+  <button class="md:hidden text-secondary-fixed-dim">
+    <span class="material-symbols-outlined text-3xl">menu_open</span>
+  </button>
+</nav>
+</header>
+
+<main class="relative pt-20">
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute top-[10%] -left-[10%] w-[600px] h-[600px] bg-secondary-fixed-dim/10 rounded-full animate-pulse-glow"></div>
+  <div class="absolute bottom-[20%] -right-[10%] w-[500px] h-[500px] bg-tertiary-fixed-dim/5 rounded-full animate-pulse-glow" style="animation-delay: 2s;"></div>
+</div>
+
+<section class="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-margin-mobile overflow-hidden">
+  <div class="absolute inset-0 z-0 pointer-events-none">
+    <div class="absolute inset-0 bg-[#0a0f1e]"></div>
+    <canvas class="opacity-20" id="matrix-canvas"></canvas>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0a0f1e]/40 via-background/80 to-background"></div>
+  </div>
+  <div class="z-10 max-w-4xl animate-float">
+    <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-secondary-fixed-dim/30 bg-secondary-fixed-dim/5 mb-8 backdrop-blur-md">
+      <span class="w-2 h-2 rounded-full bg-tertiary-fixed shadow-[0_0_10px_#2ae500]"></span>
+      <span class="font-label-sm text-label-sm text-secondary-fixed-dim uppercase tracking-[0.2em]">System Online: v2.0.4</span>
+    </div>
+    <h1 class="font-headline-xl text-headline-lg-mobile md:text-headline-xl mb-6 text-on-surface leading-[1.05]">
+      <span class="block opacity-80 font-light">BIOCRAFT</span>
+      <span class="block bg-gradient-to-r from-secondary-fixed-dim to-white bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,220,229,0.4)]">DIGITAL</span>
+    </h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-2xl mx-auto leading-relaxed">
+      Crafting the future of IT through the seamless integration of biological intuition and digital precision.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+      <button class="w-full sm:w-auto px-10 py-5 bg-secondary-fixed-dim text-on-secondary font-label-md text-label-md rounded-lg font-bold hover:shadow-[0_0_30px_rgba(0,220,229,0.5)] hover:scale-105 transition-all active:scale-95">
+        EXPLORE SOLUTIONS
+      </button>
+      <button class="w-full sm:w-auto px-10 py-5 border border-white/10 glass-card text-on-surface font-label-md text-label-md rounded-lg font-bold hover:bg-white/10 transition-all">
+        VIEW ECOSYSTEM
+      </button>
+    </div>
+  </div>
+  <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+    <span class="material-symbols-outlined text-3xl">expand_more</span>
+  </div>
+</section>
+
+<section class="py-32 px-margin-mobile max-w-container-max mx-auto reveal-on-scroll" id="about">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+    <div class="relative group">
+      <div class="absolute -inset-4 bg-secondary-fixed-dim/10 rounded-2xl blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+      <div class="relative rounded-2xl overflow-hidden glass-card aspect-video md:aspect-square">
+        <img alt="Biocraft Evolution" class="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all duration-1000 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJA1o15jnKGr4ig-XfMDQMKCDjC01327k03SAfLCBNHOGX3m1O3bbtCR1Sq95jAOiziSEZ6FgB2_MjKy6MJlN9NfwOJRFmsMDBiSxTeeTlpyaKL7yVJPU6sYbdzCGuZvcJV_ynsP8fOv-OOnW2GHOur7hKZB5AA6CVsxNBpIziEIhqjeGTONVoCD7IcrVdWGliFldk8od1ij4Kt7WJyG4ikFsM6rVO2qCZbRIpmio5g-pcPHnTbjcFm3YglRqwBNNPezTie5UBtYk"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-40"></div>
+      </div>
+    </div>
+    <div class="lg:pl-12">
+      <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-secondary-fixed-dim mb-8">INTELLIGENCE <br/>REIMAGINED</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mb-10 leading-relaxed max-w-lg">
+        At Biocraft Digital, we don't just build software; we evolve it. Our approach merges the adaptability of organic systems with the rigorous logic of modern computer science.
+      </p>
+      <div class="grid grid-cols-2 gap-12 border-t border-white/10 pt-10">
+        <div>
+          <div class="text-secondary-fixed-dim font-headline-md text-headline-md mb-2">99.9%</div>
+          <div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant opacity-60">Uptime Reliability</div>
+        </div>
+        <div>
+          <div class="text-tertiary-fixed-dim font-headline-md text-headline-md mb-2">45ms</div>
+          <div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant opacity-60">Response Latency</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-32 px-margin-mobile max-w-container-max mx-auto" id="services">
+  <div class="text-center mb-20 reveal-on-scroll">
+    <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-6">OUR CAPABILITIES</h2>
+    <div class="w-24 h-1 bg-secondary-fixed-dim mx-auto rounded-full shadow-[0_0_10px_rgba(0,220,229,0.5)]"></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal-on-scroll">
+    <div class="glass-card p-10 rounded-2xl group hover:-translate-y-3 transition-all duration-500 cyan-glow border-t-2 border-l-2 border-white/5 h-full flex flex-col">
+      <div class="mb-8 w-16 h-16 rounded-xl bg-secondary-fixed-dim/10 flex items-center justify-center text-secondary-fixed-dim group-hover:bg-secondary-fixed-dim group-hover:text-on-secondary transition-colors duration-500">
+        <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 0;">terminal</span>
+      </div>
+      <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Custom Software</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant opacity-80 leading-relaxed mb-8 flex-grow">
+        Architecting robust, scalable platforms tailored to the specific DNA of your business operations.
+      </p>
+      <div class="flex flex-wrap gap-2 pt-4">
+        <span class="font-label-sm text-label-sm px-4 py-1.5 rounded-full bg-white/5 text-secondary-fixed-dim border border-white/10 uppercase">Scalable</span>
+        <span class="font-label-sm text-label-sm px-4 py-1.5 rounded-full bg-white/5 text-secondary-fixed-dim border border-white/10 uppercase">Bespoke</span>
+      </div>
+    </div>
+    <div class="glass-card p-10 rounded-2xl group hover:-translate-y-3 transition-all duration-500 cyan-glow border-t-2 border-l-2 border-white/5 md:-translate-y-4 bg-surface-container-low/80 h-full flex flex-col">
+      <div class="mb-8 w-16 h-16 rounded-xl bg-tertiary-fixed-dim/10 flex items-center justify-center text-tertiary-fixed-dim group-hover:bg-tertiary-fixed-dim group-hover:text-on-tertiary transition-colors duration-500">
+        <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 0;">cloud_done</span>
+      </div>
+      <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Cloud Infra</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant opacity-80 leading-relaxed mb-8 flex-grow">
+        Next-gen serverless architectures and hybrid cloud deployments that grow with your organizational needs.
+      </p>
+      <div class="flex flex-wrap gap-2 pt-4">
+        <span class="font-label-sm text-label-sm px-4 py-1.5 rounded-full bg-white/5 text-tertiary-fixed-dim border border-white/10 uppercase">Edge</span>
+        <span class="font-label-sm text-label-sm px-4 py-1.5 rounded-full bg-white/5 text-tertiary-fixed-dim border border-white/10 uppercase">Serverless</span>
+      </div>
+    </div>
+    <div class="glass-card p-10 rounded-2xl group hover:-translate-y-3 transition-all duration-500 cyan-glow border-t-2 border-l-2 border-white/5 h-full flex flex-col">
+      <div class="mb-8 w-16 h-16 rounded-xl bg-secondary-fixed-dim/10 flex items-center justify-center text-secondary-fixed-dim group-hover:bg-secondary-fixed-dim group-hover:text-on-secondary transition-colors duration-500">
+        <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 0;">psychology</span>
+      </div>
+      <h3 class="font-headline-md text-headline-md text-on-surface mb-4">AI Integration</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant opacity-80 leading-relaxed mb-8 flex-grow">
+        Embedding machine learning and cognitive computing into your workflow for automated decision making.
+      </p>
+      <div class="flex flex-wrap gap-2 pt-4">
+        <span class="font-label-sm text-label-sm px-4 py-1.5 rounded-full bg-white/5 text-secondary-fixed-dim border border-white/10 uppercase">Neural</span>
+        <span class="font-label-sm text-label-sm px-4 py-1.5 rounded-full bg-white/5 text-secondary-fixed-dim border border-white/10 uppercase">LLM</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-32 px-margin-mobile relative overflow-hidden">
+  <div class="absolute inset-0 bg-secondary-fixed-dim/5 skew-y-3"></div>
+  <div class="relative max-w-4xl mx-auto text-center reveal-on-scroll">
+    <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-12">INITIATE CONNECTION</h2>
+    <div class="glass-card p-10 md:p-16 rounded-3xl text-left border-white/5">
+      <form id="contact-form" class="space-y-8" onsubmit="handleContact(event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="space-y-3">
+            <label class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant/70 ml-1">IDENTIFIER</label>
+            <input id="contact-name" class="w-full bg-surface-container-lowest/50 border border-white/10 rounded-xl p-5 font-body-md text-on-surface focus:ring-2 focus:ring-secondary-fixed-dim/50 focus:border-secondary-fixed-dim transition-all outline-none" placeholder="Your Name" type="text" required/>
+          </div>
+          <div class="space-y-3">
+            <label class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant/70 ml-1">UPLINK ADDRESS</label>
+            <input id="contact-email" class="w-full bg-surface-container-lowest/50 border border-white/10 rounded-xl p-5 font-body-md text-on-surface focus:ring-2 focus:ring-secondary-fixed-dim/50 focus:border-secondary-fixed-dim transition-all outline-none" placeholder="email@domain.com" type="email" required/>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <label class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant/70 ml-1">TRANSMISSION DATA</label>
+          <textarea id="contact-message" class="w-full bg-surface-container-lowest/50 border border-white/10 rounded-xl p-5 font-body-md text-on-surface focus:ring-2 focus:ring-secondary-fixed-dim/50 focus:border-secondary-fixed-dim transition-all outline-none resize-none" placeholder="Briefly describe your requirements..." rows="5" required></textarea>
+        </div>
+        <div id="contact-feedback" class="hidden p-4 rounded-xl text-sm"></div>
+        <button class="w-full py-6 bg-white text-background font-bold text-label-md tracking-[0.2em] uppercase rounded-xl hover:bg-secondary-fixed-dim hover:text-on-secondary transition-all hover:shadow-[0_0_30px_rgba(0,220,229,0.4)] active:scale-[0.98]" type="submit">
+          SEND TRANSMISSION
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="w-full py-12 border-t border-white/5 bg-surface-container-lowest">
+  <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter">
+    <div class="flex flex-col items-center md:items-start gap-4">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">biotech</span>
+        <span class="font-headline-md text-headline-md text-secondary-fixed-dim font-bold">BIOCRAFT DIGITAL</span>
+      </div>
+      <p class="font-label-sm text-label-sm text-on-surface-variant opacity-60">© 2024 BIOCRAFT DIGITAL. EVOLVING INTELLIGENCE.</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-8">
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary-fixed-dim transition-colors duration-300" href="#">Privacy Policy</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary-fixed-dim transition-colors duration-300" href="#">Terms of Service</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary-fixed-dim transition-colors duration-300" href="#">Security</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary-fixed-dim transition-colors duration-300" href="#">Status</a>
+    </div>
+    <div class="flex gap-4">
+      <a class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-secondary-fixed-dim hover:border-secondary-fixed-dim/50 transition-all duration-300" href="#">
+        <span class="material-symbols-outlined text-xl">public</span>
+      </a>
+      <a class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-secondary-fixed-dim hover:border-secondary-fixed-dim/50 transition-all duration-300" href="#">
+        <span class="material-symbols-outlined text-xl">memory</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<div id="auth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+  <div class="absolute inset-0" onclick="toggleAuthModal(false)"></div>
+  <div class="relative w-full max-w-md glass-card p-8 rounded-3xl border-white/5 shadow-2xl z-10 bg-surface-container-lowest/90">
+    <button onclick="toggleAuthModal(false)" class="absolute top-4 right-4 text-on-surface-variant hover:text-white">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="flex border-b border-white/10 mb-6 pb-1">
+      <button id="modal-tab-login" onclick="switchModalTab('login')" class="flex-1 pb-3 text-center font-label-md text-secondary-fixed-dim border-b-2 border-secondary-fixed-dim font-bold tracking-wider">LOGIN</button>
+      <button id="modal-tab-register" onclick="switchModalTab('register')" class="flex-1 pb-3 text-center font-label-md text-on-surface-variant font-medium tracking-wider">REGISTER</button>
+    </div>
+    <div id="modal-feedback" class="hidden mb-4 p-3 rounded-xl font-label-sm text-sm"></div>
+    <form id="modal-auth-form" class="space-y-4" onsubmit="handleModalAuth(event)">
+      <div id="modal-field-email" class="space-y-1 hidden">
+        <label class="font-label-sm text-xs uppercase tracking-widest text-on-surface-variant/70">EMAIL</label>
+        <input id="modal-email" class="w-full bg-surface-container-lowest border border-white/10 rounded-xl p-3 font-body-md text-on-surface text-sm focus:ring-2 focus:ring-secondary-fixed-dim/50 outline-none" placeholder="email@domain.com" type="email"/>
+      </div>
+      <div class="space-y-1">
+        <label class="font-label-sm text-xs uppercase tracking-widest text-on-surface-variant/70">USERNAME</label>
+        <input id="modal-username" required class="w-full bg-surface-container-lowest border border-white/10 rounded-xl p-3 font-body-md text-on-surface text-sm focus:ring-2 focus:ring-secondary-fixed-dim/50 outline-none" placeholder="Username" type="text"/>
+      </div>
+      <div class="space-y-1">
+        <label class="font-label-sm text-xs uppercase tracking-widest text-on-surface-variant/70">PASSWORD</label>
+        <input id="modal-password" required class="w-full bg-surface-container-lowest border border-white/10 rounded-xl p-3 font-body-md text-on-surface text-sm focus:ring-2 focus:ring-secondary-fixed-dim/50 outline-none" placeholder="••••••••" type="password"/>
+      </div>
+      <button class="w-full py-4 bg-white text-background font-bold text-label-md tracking-[0.2em] uppercase rounded-xl hover:bg-secondary-fixed-dim hover:text-on-secondary transition-all" type="submit">
+        SUBMIT
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+let width, height, columns, drops;
+const fontSize = 18;
+let lastTime = 0;
+const frameInterval = 80;
+
+function initMatrix() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+  columns = Math.floor(width / fontSize);
+  drops = [];
+  for (let i = 0; i < columns; i++) {
+    drops[i] = (Math.random() * height) / fontSize;
+  }
+}
+
+function drawMatrix(timestamp) {
+  if (timestamp - lastTime < frameInterval) { requestAnimationFrame(drawMatrix); return; }
+  lastTime = timestamp;
+  ctx.fillStyle = 'rgba(10, 15, 30, 0.05)';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#00dce5';
+  ctx.font = `${fontSize}px JetBrains Mono`;
+  for (let i = 0; i < drops.length; i++) {
+    const text = Math.random() > 0.5 ? '1' : '0';
+    const x = i * fontSize;
+    const y = drops[i] * fontSize;
+    ctx.globalAlpha = Math.random() * 0.3 + 0.1;
+    ctx.fillText(text, x, y);
+    ctx.globalAlpha = 1.0;
+    drops[i] += 0.4;
+    if (drops[i] * fontSize > height && Math.random() > 0.985) { drops[i] = 0; }
+  }
+  requestAnimationFrame(drawMatrix);
+}
+
+window.addEventListener('resize', initMatrix);
+initMatrix();
+requestAnimationFrame(drawMatrix);
+
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('active'); } });
+}, observerOptions);
+document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const targetId = this.getAttribute('href');
+    if (targetId === '#') return;
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) { targetElement.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+let modalMode = 'login';
+
+function toggleAuthModal(show) {
+  const modal = document.getElementById('auth-modal');
+  if (show) modal.classList.remove('hidden');
+  else modal.classList.add('hidden');
+}
+
+function switchModalTab(mode) {
+  modalMode = mode;
+  const tabLogin = document.getElementById('modal-tab-login');
+  const tabRegister = document.getElementById('modal-tab-register');
+  const fieldEmail = document.getElementById('modal-field-email');
+  const emailInput = document.getElementById('modal-email');
+
+  if (mode === 'login') {
+    tabLogin.className = "flex-1 pb-3 text-center font-label-md text-secondary-fixed-dim border-b-2 border-secondary-fixed-dim font-bold tracking-wider";
+    tabRegister.className = "flex-1 pb-3 text-center font-label-md text-on-surface-variant font-medium tracking-wider";
+    fieldEmail.classList.add('hidden');
+    emailInput.removeAttribute('required');
+  } else {
+    tabRegister.className = "flex-1 pb-3 text-center font-label-md text-secondary-fixed-dim border-b-2 border-secondary-fixed-dim font-bold tracking-wider";
+    tabLogin.className = "flex-1 pb-3 text-center font-label-md text-on-surface-variant font-medium tracking-wider";
+    fieldEmail.classList.remove('hidden');
+    emailInput.setAttribute('required', 'true');
+  }
+}
+
+async function handleModalAuth(e) {
+  e.preventDefault();
+  const feedback = document.getElementById('modal-feedback');
+  const username = document.getElementById('modal-username').value;
+  const password = document.getElementById('modal-password').value;
+  feedback.classList.add('hidden');
+
+  try {
+    if (modalMode === 'register') {
+      const email = document.getElementById('modal-email').value;
+      await API.register(username, email, password);
+      feedback.className = "mb-4 p-3 rounded-xl font-label-sm text-sm bg-tertiary/10 text-tertiary border border-tertiary/20";
+      feedback.innerText = "SUCCESS: Account created. Please login.";
+      feedback.classList.remove('hidden');
+      switchModalTab('login');
+    } else {
+      await API.login(username, password);
+      const user = await API.getMe();
+      window.location.href = user.is_admin ? "/static/admin.html" : "/static/dashboard.html";
+    }
+  } catch (err) {
+    feedback.className = "mb-4 p-3 rounded-xl font-label-sm text-sm bg-error-container text-on-error-container";
+    feedback.innerText = `ERROR: ${err.message}`;
+    feedback.classList.remove('hidden');
+  }
+}
+
+async function handleContact(e) {
+  e.preventDefault();
+  const fb = document.getElementById('contact-feedback');
+  fb.classList.add('hidden');
+
+  try {
+    const name = document.getElementById('contact-name').value;
+    const email = document.getElementById('contact-email').value;
+    const message = document.getElementById('contact-message').value;
+    const res = await fetch("/inquiries/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Failed");
+    fb.className = "mb-4 p-4 rounded-xl text-sm bg-tertiary/10 text-tertiary border border-tertiary/20";
+    fb.innerText = "TRANSMISSION SENT. We will respond within 24 hours.";
+    fb.classList.remove('hidden');
+    document.getElementById('contact-form').reset();
+  } catch (err) {
+    fb.className = "mb-4 p-4 rounded-xl text-sm bg-error-container text-on-error-container";
+    fb.innerText = `ERROR: ${err.message}`;
+    fb.classList.remove('hidden');
+  }
+}
+
+// Update navbar based on auth state
+(async function() {
+  if (API.isLoggedIn()) {
+    try {
+      const user = await API.getMe();
+      const link = user.is_admin ? '/static/admin.html' : '/static/dashboard.html';
+      document.getElementById('nav-auth-links').innerHTML =
+        `<a href="${link}" class="font-label-md text-label-md text-secondary-fixed-dim hover:text-white transition-colors duration-300 cursor-pointer">${user.is_admin ? 'Admin' : 'Dashboard'}</a>` +
+        '<span class="ml-4"><button onclick="API.logout()" class="font-label-md text-label-md text-on-surface-variant hover:text-[#ffb4ab] transition-colors duration-300 cursor-pointer">Logout</button></span>';
+    } catch {
+      API.logout();
+    }
+  }
+})();
+</script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/chat.js"></script>
+</body>
+</html>
